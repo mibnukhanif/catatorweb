@@ -437,7 +437,7 @@
         }
 
         async function fetchGAS(payload) {
-            const isDummyURL = GAS_URL === "https://script.google.com/macros/s/AKfycbwW2h3jGEBbCp1SeeBplymoZNBYGVpTzlUNGdXH1uPr1XJk2ndcmMPrD0TUrLvdH0Bd/exec";
+            const isDummyURL = GAS_URL === "https://script.google.com/macros/s/AKfycby5hTf1W_c3D0u2P9447472ZzPZ9D74fU1h47f4f_4/exec" || GAS_URL === "https://script.google.com/macros/s/AKfycbwW2h3jGEBbCp1SeeBplymoZNBYGVpTzlUNGdXH1uPr1XJk2ndcmMPrD0TUrLvdH0Bd/exec";
             
             // Jika menggunakan URL dummy, gunakan mock backend agar preview tetap berjalan
             if (isDummyURL) {
@@ -458,8 +458,8 @@
                 return await response.json();
             } catch (error) {
                 console.error("Fetch error:", error);
-                // Fallback ke mock jika koneksi fetch gagal (misal diblokir browser di halaman preview)
-                return mockBackend(payload);
+                // Menghapus fallback ke mockBackend agar error asli muncul
+                return { success: false, message: "Koneksi ke Google Sheet gagal! Pastikan setting akses deploy GAS adalah 'Siapa saja' (Anyone)." };
             }
         }
 
