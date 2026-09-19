@@ -619,16 +619,42 @@
             const ord = state.orders.find(o => o.ID == id);
             if (!ord) return;
             
+            const formatForDateInput = (val) => {
+                if (!val) return '';
+                // 1. Jika format sudah pas YYYY-MM-DD
+                if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+                
+                // 2. Jika format ada string T (contoh ISO: 2026-09-19T...)
+                if (typeof val === 'string' && val.includes('T')) return val.split('T')[0];
+                
+                let d = new Date(val);
+                // 3. Antisipasi format Excel/Spreadsheet lokal seperti DD/MM/YYYY
+                if (isNaN(d.getTime()) && typeof val === 'string') {
+                    const parts = val.split(/[\/\-]/);
+                    if (parts.length === 3 && parts[2].length === 4) {
+                        d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`); // Konversi manual ke YYYY-MM-DD
+                    }
+                }
+                
+                if (isNaN(d.getTime())) return ''; // Tetap gagal parsing, biarkan kosong
+                
+                // 4. Format balik standar YYYY-MM-DD
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                return `${yyyy}-${mm}-${dd}`;
+            };
+            
             document.getElementById('formTitle').innerHTML = '<span class="text-orange-500">Edit Data Order</span>';
             document.getElementById('form_id').value = ord.ID;
             document.getElementById('form_nama').value = ord['Nama Pelanggan'];
             document.getElementById('form_domain').value = ord['Domain'];
             document.getElementById('form_wa').value = ord['WhatsApp'];
-            document.getElementById('form_tgl_order').value = ord['Tgl Order'];
+            document.getElementById('form_tgl_order').value = formatForDateInput(ord['Tgl Order']);
             document.getElementById('form_masa').value = ord['Masa Aktif'];
             document.getElementById('form_biaya').value = ord['Biaya'];
             document.getElementById('form_pembayaran').value = ord['Status Pembayaran'];
-            document.getElementById('form_tgl_bayar').value = ord['Tgl Bayar Terakhir'];
+            document.getElementById('form_tgl_bayar').value = formatForDateInput(ord['Tgl Bayar Terakhir']);
             document.getElementById('form_hosting').value = ord['Hosting'];
             document.getElementById('form_catatan').value = ord['Catatan'];
             
